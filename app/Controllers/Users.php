@@ -21,23 +21,15 @@ class Users extends BaseController
 
         $search = $this->request->getVar('search')['value'];
         if ($search) {
-            $data = $this->base_model->like('nama', $search)->findAll($limit, $offset);
-            $total_rows   = $this->base_model->like('nama', $search)->countAllResults();
-        }
-
-        $get_role = $this->request->getVar('role');
-        if ($get_role) {
-            $role       = model('Role')->select(['id', 'slug'])->where('slug', $get_role)->first();
-            $data       = $this->base_model->where('id_role', $role['id'])->findAll($limit, $offset);
-            $total_rows = $this->base_model->where('id_role', $role['id'])->countAllResults();
+            $data = $this->base_model->like('username', $search)->findAll($limit, $offset);
+            $total_rows   = $this->base_model->like('username', $search)->countAllResults();
         }
 
         foreach ($data as $key => $v) {
             $data[$key]['no_urut'] = $offset + $key + 1;
             $data[$key]['id'] = encode($v['id']);
+            $data[$key]['id_decode'] = $v['id'];
             $data[$key]['nama_role'] = model('Role')->select(['id', 'nama'])->where('id', $v['id_role'])->first()['nama'];
-            $data[$key]['foto_profil'] = $v['foto_profil'] ? base_url($this->upload_path) . $v['foto_profil'] : base_url('assets/uploads/default.png');
-            $data[$key]['no_hp'] = $v['no_hp'] ? '+62 ' . $v['no_hp'] : null;
             $data[$key]['created_at'] = date('d-m-Y H:i:s', strtotime($v['created_at']));
         }
 
@@ -81,37 +73,18 @@ class Users extends BaseController
     public function create()
     {
         $rules = [
-            'id_role'       => 'required',
-            'nama'          => 'required',
-            'email'         => "required|valid_email|is_unique[$this->base_name.email]",
-            'password'      => 'required|min_length[8]',
-            'passconf'      => 'required|min_length[8]|matches[password]',
-            'jenis_kelamin' => 'required',
-            'foto_profil'   => 'max_size[foto_profil,1024]|ext_in[foto_profil,png,jpg,jpeg]|mime_in[foto_profil,image/png,image/jpg,image/jpeg]|is_image[foto_profil]',
-            'alamat'        => 'max_length[255]',
-            'no_hp'         => "permit_empty|numeric|min_length[10]|max_length[15]|is_unique[$this->base_name.no_hp]",
+            'id_user'   => "required|numeric|min_length[12]|max_length[12]|is_unique[$this->base_name.id]",
+            'password'  => 'required',
+            'passconf'  => 'required|matches[password]',
         ];
         if (! $this->validate($rules)) {
             return redirect()->back()->withInput();
         }else {
-            $foto_profil = $this->request->getFile('foto_profil');
-            if ($foto_profil != '') {
-                $foto_profil_name = $foto_profil->getRandomName();
-                $this->image->withFile($foto_profil)->save($this->upload_path . $foto_profil_name, 60);
-            } else {
-                $foto_profil_name = '';
-            }
-
             $password = $this->request->getVar('password');
             $data = [
-                'id_role'       => $this->request->getVar('id_role', $this->filter),
-                'nama'          => ucwords($this->request->getVar('nama', $this->filter)),
-                'email'         => $this->request->getVar('email', FILTER_SANITIZE_EMAIL),
-                'password'      => $this->base_model->password_hash($password),
-                'jenis_kelamin' => $this->request->getVar('jenis_kelamin', $this->filter),
-                'foto_profil'   => $foto_profil_name,
-                'alamat'        => $this->request->getVar('alamat', $this->filter),
-                'no_hp'         => $this->request->getVar('no_hp', $this->filter),
+                'id_role'   => 2,
+                'id'        => $this->request->getVar('id_user', $this->filter),
+                'password'  => $this->base_model->password_hash($password),
             ];
 
             $this->base_model->insert($data);
@@ -137,7 +110,7 @@ class Users extends BaseController
             'data'        => $this->base_model->find($id),
             'upload_path' => $this->upload_path,
             'base_route'  => $this->base_route,
-            'title'       => 'Edit ' . ucwords(str_replace('_', ' ', $this->base_name)),
+            'title'       => 'Edit User',
         ];
         
         $view['sidebar'] = view('dashboard/sidebar');
@@ -151,38 +124,16 @@ class Users extends BaseController
         $find_data = $this->base_model->find($id);
 
         $rules = [
-            'id_role'       => 'required',
-            'nama'          => 'required',
-            'passconf'      => 'permit_empty|min_length[8]|matches[password]',
-            'jenis_kelamin' => 'required',
-            'foto_profil'   => 'max_size[foto_profil,1024]|ext_in[foto_profil,png,jpg,jpeg]|mime_in[foto_profil,image/png,image/jpg,image/jpeg]|is_image[foto_profil]',
-            'alamat'        => 'max_length[255]',
-            'email'         => "required|valid_email|is_unique[$this->base_name.email,id,$id]",
-            'no_hp'         => "permit_empty|numeric|min_length[10]|max_length[15]|is_unique[$this->base_name.no_hp,id,$id]",
+            'id_user'   => "required|numeric|min_length[12]|max_length[12]|is_unique[$this->base_name.id,id,$id]",
+            'passconf'  => 'permit_empty|required|matches[password]',
         ];
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput();
         } else {
-            $foto_profil = $this->request->getFile('foto_profil');
-            if ($foto_profil != '') {
-                $file = $this->upload_path . $find_data['foto_profil'];
-                if (is_file($file)) unlink($file);
-                $foto_profil_name = $foto_profil->getRandomName();
-                $this->image->withFile($foto_profil)->save($this->upload_path . $foto_profil_name, 60);
-            } else {
-                $foto_profil_name = $find_data['foto_profil'];
-            }
-
             $password = $this->request->getVar('password');
             $data = [
-                'id_role'       => $this->request->getVar('id_role', $this->filter),
-                'nama'          => ucwords($this->request->getVar('nama', $this->filter)),
-                'email'         => $this->request->getVar('email', FILTER_SANITIZE_EMAIL),
-                'password'      => $password != '' ? $this->base_model->password_hash($password) : $find_data['password'],
-                'jenis_kelamin' => $this->request->getVar('jenis_kelamin', $this->filter),
-                'foto_profil'   => $foto_profil_name,
-                'alamat'        => $this->request->getVar('alamat', $this->filter),
-                'no_hp'         => $this->request->getVar('no_hp', $this->filter),
+                'id'        => $this->request->getVar('id_user', $this->filter),
+                'password'  => $this->base_model->password_hash($password),
             ];
 
             $this->base_model->update($id, $data);
@@ -205,9 +156,6 @@ class Users extends BaseController
         $id = decode($id_encode);
         $find_data = $this->base_model->find($id);
 
-        $foto_profil = $this->upload_path . $find_data['foto_profil'];
-        if (is_file($foto_profil)) unlink($foto_profil);
-
         $this->base_model->delete($id);
         return redirect()->to($this->base_route)
         ->with('message',
@@ -215,176 +163,6 @@ class Users extends BaseController
             Swal.fire({
             icon: 'success',
             title: 'Data berhasil dihapus',
-            showConfirmButton: false,
-            timer: 2500,
-            timerProgressBar: true,
-            })
-        </script>");
-    }
-
-    public function deleteImg($id_encode = null)
-    {
-        $id = decode($id_encode);
-        $find_data = $this->base_model->find($id);
-
-        if ($find_data['foto_profil'] != '') {
-            $file = $this->upload_path . $find_data['foto_profil'];
-            if (is_file($file)) unlink($file);
-        }
-
-        $this->base_model->update($id, ['foto_profil' => '']);
-        return redirect()->to($this->base_route . '/edit/' . $id_encode)
-        ->with('message',
-        "<script>
-            Swal.fire({
-            icon: 'success',
-            title: 'Foto profil dihapus',
-            showConfirmButton: false,
-            timer: 2500,
-            timerProgressBar: true,
-            })
-        </script>");
-    }
-
-    public function profile()
-    {
-        $id = $this->user_session['id'];
-
-        $data = [
-            'data'        => $this->base_model->find($id),
-            'upload_path' => $this->upload_path,
-            'base_route'  => $this->base_route,
-            'title'       => 'Profil',
-        ];
-        
-        $view['sidebar'] = view('dashboard/sidebar');
-        $view['content'] = view($this->base_name . '/profile', $data);
-        return view('dashboard/header', $view);
-    }
-
-    public function updateProfile()
-    {
-        $id = $this->user_session['id'];
-        $find_data = $this->base_model->find($id);
-
-        $rules = [
-            'nama'          => 'required',
-            'jenis_kelamin' => 'required',
-            'foto_profil'   => 'max_size[foto_profil,1024]|ext_in[foto_profil,png,jpg,jpeg]|mime_in[foto_profil,image/png,image/jpg,image/jpeg]|is_image[foto_profil]',
-            'alamat'        => 'max_length[255]',
-            'email'         => "required|valid_email|is_unique[$this->base_name.email,id,$id]",
-            'no_hp'         => "permit_empty|numeric|min_length[10]|max_length[15]|is_unique[$this->base_name.no_hp,id,$id]",
-        ];
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput();
-        } else {
-            $foto_profil = $this->request->getFile('foto_profil');
-            if ($foto_profil != '') {
-                $file = $this->upload_path . $find_data['foto_profil'];
-                if (is_file($file)) unlink($file);
-                $foto_profil_name = $foto_profil->getRandomName();
-                $this->image->withFile($foto_profil)->save($this->upload_path . $foto_profil_name, 60);
-            } else {
-                $foto_profil_name = $find_data['foto_profil'];
-            }
-
-            $data = [
-                'nama'          => ucwords($this->request->getVar('nama', $this->filter)),
-                'jenis_kelamin' => $this->request->getVar('jenis_kelamin', $this->filter),
-                'foto_profil'   => $foto_profil_name,
-                'alamat'        => $this->request->getVar('alamat', $this->filter),
-                'email'         => $this->request->getVar('email', FILTER_SANITIZE_EMAIL),
-                'no_hp'         => $this->request->getVar('no_hp', $this->filter),
-            ];
-
-            $this->base_model->update($id, $data);
-            return redirect()->to($this->base_route)
-            ->with('message',
-            "<script>
-                Swal.fire({
-                icon: 'success',
-                title: 'Perubahan disimpan',
-                showConfirmButton: false,
-                timer: 2500,
-                timerProgressBar: true,
-                })
-            </script>");
-        }
-    }
-
-    public function updatePassword()
-    {
-        $id = $this->user_session['id'];
-        $find_data = $this->base_model->find($id);
-
-        $oldpass = trim($this->request->getVar('oldpass'));
-        $password = trim($this->request->getVar('password'));
-        $passconf = trim($this->request->getVar('passconf'));
-        if (
-            !empty($oldpass && $password && $passconf)
-            && (strlen($password) >= 8)
-            && (strlen($passconf) >= 8)
-        ) {
-            if (($find_data['password'] == $this->base_model->password_hash($oldpass)) && ($password == $passconf)) {
-                $data = [
-                    'password'  => $this->base_model->password_hash($password),
-                ];
-                $this->base_model->update($id, $data);
-                session()->remove(['isLogin', 'user']);
-                return redirect()->to(base_url('login'))
-                ->with('message',
-                "<script>
-                    Swal.fire({
-                    icon: 'success',
-                    title: 'Password berhasil diubah. Silakan login kembali.',
-                    showConfirmButton: false,
-                    timer: 2500,
-                    timerProgressBar: true,
-                    })
-                </script>");
-            } else {
-                return redirect()->to($this->base_route)
-                ->with('message',
-                "<script>
-                    Swal.fire({
-                    icon: 'error',
-                    title: 'Password saat ini salah!',
-                    showConfirmButton: false,
-                    timer: 2500,
-                    timerProgressBar: true,
-                    })
-                </script>");
-            }
-        } else {
-            return redirect()->to($this->base_route)
-            ->with('message',
-            "<script>
-                Swal.fire({
-                icon: 'error',
-                title: 'Password setidaknya harus berisi 8 karakter!',
-                showConfirmButton: false,
-                timer: 2500,
-                timerProgressBar: true,
-                })
-            </script>");
-        }
-    }
-
-    public function deleteProfileImg()
-    {
-        $id = $this->user_session['id'];
-        $find_data = $this->base_model->find($id);
-
-        $foto_profil = $this->upload_path . $find_data['foto_profil'];
-        if (is_file($foto_profil)) unlink($foto_profil);
-
-        $this->base_model->update($id, ['foto_profil' => '']);
-        return redirect()->to($this->base_route)
-        ->with('message',
-        "<script>
-            Swal.fire({
-            icon: 'success',
-            title: 'Foto profil dihapus',
             showConfirmButton: false,
             timer: 2500,
             timerProgressBar: true,

@@ -51,23 +51,10 @@ $logo = base_url('assets/uploads/app_settings/') . $app_settings['logo'];
 			</script>
 			<li class="nav-item dropdown pe-3">
 				<a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-					<?php
-					if ($user_session['foto_profil']) {
-						$foto_profil = base_url('assets/uploads/users/' . $user_session['foto_profil']);
-					} else {
-						$foto_profil = base_url('assets/uploads/user-default.png');
-					}
-					?>
-					<img src="<?= $foto_profil ?>" alt="Profile" class="rounded-circle img-style" style="width:36px;height:36px">
-					<span class="d-none d-md-block dropdown-toggle ps-2" style="color:var(--dark-color)"><?= implode(' ', array_slice(explode(' ', $user_session['nama']), 0, 3)); ?></span>
+					<img src="<?= base_url('assets/uploads/user-default.png'); ?>" alt="Profile" class="rounded-circle img-style" style="width:36px;height:36px">
+					<span class="d-none d-md-block dropdown-toggle ps-2" style="color:var(--dark-color)"><?= $user_session['id']; ?></span>
 				</a>
 				<ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-					<li>
-						<a class="dropdown-item d-flex align-items-center" href="<?= base_url($user_role) . '/profile' ?>">
-							<i class="fa-solid fa-user" style="font-size:16px"></i>
-							<span>Profil</span>
-						</a>
-					</li>
 					<li>
 						<hr class="dropdown-divider">
 					</li>
@@ -118,13 +105,6 @@ $logo = base_url('assets/uploads/app_settings/') . $app_settings['logo'];
 			'icon'		=> 'fa-solid fa-gear',
 			'url'		=> base_url($user_role) . '/app-settings',
 			'role'		=> [1],
-			'type'	    => 'no-collapse',
-		],
-		[
-			'title'		=> 'Profil',
-			'icon'		=> 'fa-solid fa-user',
-			'url'		=> base_url($user_role) . '/profile',
-			'role'		=> [1, 2, 3],
 			'type'	    => 'no-collapse',
 		],
 		[

@@ -22,7 +22,7 @@ class Auth extends BaseController
     public function loginProcess()
     {
         $rules = [
-            'email'     => 'required|valid_email',
+            'id_user'   => 'required|alpha_numeric',
             'password'  => 'required',
         ];
         if (!$this->validate($rules)) {
@@ -30,10 +30,11 @@ class Auth extends BaseController
         } else {
             $password = $this->request->getVar('password');
             $where = [
-                'email'     => $this->request->getVar('email', FILTER_SANITIZE_EMAIL),
+                'id'        => $this->request->getVar('id_user', $this->filter),
                 'password'  => $this->base_model->password_hash($password),
             ];
             $user = $this->base_model->where($where)->first();
+
             $cek = $this->base_model->where($where)->countAllResults();
             if ($cek == 1) {
                 $session = [

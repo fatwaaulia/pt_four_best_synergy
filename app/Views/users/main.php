@@ -9,25 +9,7 @@
         <div class="col-lg-12">
             <div class="card p-3 position-relative">
                 <div class="row mb-3">
-                    <div class="col-lg-3 col-md-6 mb-3 mb-md-0">
-                        <label for="role" class="form-label">Role</label>
-                        <select class="form-select" id="role" onchange="location = this.value;">
-                            <option value="<?= current_url() ?>">All</option>
-                            <?php
-                            $role = model('Role')->findAll();
-                            foreach ($role as $v) :
-                                $selected = '';
-                                if (isset($_GET['role'])) {
-                                    if ($_GET['role'] == $v['slug']) {
-                                        $selected = 'selected';
-                                    }
-                                }
-                            ?>
-                            <option value="<?= current_url() . '?role=' . $v['slug'] ?>" <?= $selected ?>><?= $v['nama'] ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="col-lg-6 offset-lg-3 col-md-6 d-flex justify-content-end align-items-end">
+                    <div class="col-lg-6 offset-lg-6 col-md-6 d-flex justify-content-end align-items-end">
                         <a href="<?= $base_route . '/new' ?>" class="btn btn-primary">
                             <i class="fa-solid fa-plus fa-sm"></i> New
                         </a>
@@ -38,12 +20,7 @@
                         <tr>
                             <th>No.</th>
                             <th>Role</th>
-                            <th>Foto</th>
-                            <th>Nama</th>
-                            <th>Jenis Kelamin</th>
-                            <th>Alamat</th>
-                            <th>No. HP</th>
-                            <th>Email</th>
+                            <th>ID User</th>
                             <th>Created At</th>
                             <th>Opsi</th>
                         </tr>
@@ -74,21 +51,12 @@ document.addEventListener('DOMContentLoaded', function() {
         columns: [
             { data: 'no_urut' },
             { data: 'nama_role' },
-            { data: null, render: renderFoto },
-            { data: 'nama' },
-            { data: 'jenis_kelamin' },
-            { data: 'alamat' },
-            { data: 'no_hp' },
-            { data: 'email' },
+            { data: 'id_decode' },
             { data: 'created_at' },
             { data: null, render: renderOpsi },
         ],
     });
 });
-
-function renderFoto(data) {
-    return `<img src="${data.foto_profil}" class="wh-40 img-style rounded-circle" loading="lazy">`;
-}
 
 function renderOpsi(data) {
     if (data.id_role == 1) return null;
@@ -112,8 +80,8 @@ function renderOpsi(data) {
                     <p>Are you sure to delete this data?</p>
                     <table>
                         <tr>
-                            <td>Nama</td>
-                            <td>: ${data.nama}</td>
+                            <td>User Id</td>
+                            <td>: ${data.id_decode}</td>
                         </tr>
                     </table>
                 </div>

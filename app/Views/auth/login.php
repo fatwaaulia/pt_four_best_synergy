@@ -12,10 +12,10 @@
 					<form action="<?= base_url('login-process') ?>" method="POST">
 						<?= csrf_field(); ?>
 						<div class="mb-3">
-							<label for="email" class="form-label">Email</label>
-							<input type="email" class="form-control <?= validation_show_error('email') ? "is-invalid" : '' ?>" id="email" name="email" value="<?= old('email') ?>" placeholder="name@gmail.com" autofocus autocomplete="off">
+							<label for="id_user" class="form-label">User ID</label>
+							<input type="text" class="form-control <?= validation_show_error('id_user') ? "is-invalid" : '' ?>" id="id_user" name="id_user" value="<?= old('id_user') ?>" placeholder="Username" autofocus autocomplete="off">
 							<div class="invalid-feedback">
-								<?= validation_show_error('email') ?>
+								<?= validation_show_error('id_user') ?>
 							</div>
 						</div>
 						<div class="mb-3">

@@ -7,7 +7,7 @@ $user_session = model('Users')->where('id', session()->get('id_user'))->first();
         <div class="col-lg-12">
             <div class="card mt-4" style="background: linear-gradient(60deg, rgb(57 32 150) 0%, #2196F3 100%);">
                 <div class="card-body text-white">
-                    <h3 class="fw-600">Selamat datang <?= $user_session['nama'] ?>!</h3>
+                    <h3 class="fw-600">Selamat datang <?= $user_session['id'] ?>!</h3>
                     <p>Akses cepat dan pengelolaan informasi secara efisien.</p>
                 </div>
                 <div>

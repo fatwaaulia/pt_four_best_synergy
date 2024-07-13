@@ -39,12 +39,6 @@ $user_session = model('Users')->where('id', session()->get('id_user'))->first();
 if ($user_session) {
     $user_role = model('Role')->where('id', $user_session['id_role'])->first()['slug'];
     $routes->get($user_role . '/dashboard', 'Dashboard::dashboard', ['filter' => 'Auth']);
-    $routes->group($user_role . '/profile', ['filter' => 'Auth'], static function ($routes) {
-        $routes->get('/', 'Users::profile');
-        $routes->post('update', 'Users::updateProfile');
-        $routes->post('update/password', 'Users::updatePassword');
-        $routes->post('delete/image', 'Users::deleteProfileImg');
-    });
 }
 
 /*--------------------------------------------------------------
