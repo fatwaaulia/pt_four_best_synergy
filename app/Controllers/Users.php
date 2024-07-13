@@ -17,7 +17,7 @@ class Users extends BaseController
         $limit = $this->request->getVar('length') ?? $total_rows;
         $offset = $this->request->getVar('start') ?? 0;
         
-        $data = $this->base_model->findAll($limit, $offset);
+        $data = $this->base_model->orderBy('created_at DESC')->findAll($limit, $offset);
 
         $search = $this->request->getVar('search')['value'];
         if ($search) {
