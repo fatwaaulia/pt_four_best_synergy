@@ -77,7 +77,7 @@ $logo = base_url('assets/uploads/app_settings/') . $app_settings['logo'];
 			'title'		=> 'Dashboard',
 			'icon'		=> 'fa-solid fa-chart-line',
 			'url'		=> base_url($user_role) . '/dashboard',
-			'role'		=> [1, 2, 3],
+			'role'		=> [1, 2],
 			'type'	    => 'no-collapse',
 		],
 		[
