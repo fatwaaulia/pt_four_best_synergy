@@ -81,9 +81,11 @@ $logo = base_url('assets/uploads/app_settings/') . $app_settings['logo'];
 			'type'	    => 'no-collapse',
 		],
 		[
-			'title'		=> 'MASTER DATA',
-			'role'		=> [1],
-			'type'	    => 'heading',
+			'title'		=> 'Berkas',
+			'icon'		=> 'fa-solid fa-file',
+			'url'		=> base_url($user_role) . '/berkas',
+			'role'		=> [1, 2],
+			'type'	    => 'no-collapse',
 		],
 		[
 			'title'		=> 'User Management',
@@ -92,26 +94,11 @@ $logo = base_url('assets/uploads/app_settings/') . $app_settings['logo'];
 			'role'		=> [1],
 			'type'	    => 'no-collapse',
 		],
-		/*--------------------------------------------------------------
-		# Apps
-		--------------------------------------------------------------*/
-		[
-			'title'		=> 'ACCOUNT',
-			'role'		=> [1, 2, 3],
-			'type'	    => 'heading',
-		],
-		[
-			'title'		=> 'App Settings',
-			'icon'		=> 'fa-solid fa-gear',
-			'url'		=> base_url($user_role) . '/app-settings',
-			'role'		=> [1],
-			'type'	    => 'no-collapse',
-		],
 		[
 			'title'		=> 'Keluar',
 			'icon'		=> 'fa-solid fa-arrow-right-from-bracket',
 			'url'		=> base_url('logout'),
-			'role'		=> [1, 2, 3],
+			'role'		=> [1, 2],
 			'type'	    => 'no-collapse',
 		],
 	];
